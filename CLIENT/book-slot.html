@@ -110,3 +110,96 @@
         </div>
       </div>
     </div>
+    <div class="divider">OR BOOK MANUALLY</div>
+
+    <!-- NORMAL BOOKING -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">📅 Normal Booking</span>
+        <span id="slotsAvailableCount" style="font-size:0.78rem;color:var(--text-muted)"></span>
+      </div>
+      <div class="panel-body">
+
+        <div id="normalForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Full Name *</label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="name" class="form-control" placeholder="Your full name" autocomplete="name"/>
+              </div>
+              <div class="field-error" id="nameErr"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vehicle Number *</label>
+              <div class="input-wrap">
+                <span class="input-icon">🚗</span>
+                <input type="text" id="vehicle" class="form-control" placeholder="e.g. AB12 CDE" autocomplete="off" style="text-transform:uppercase"/>
+              </div>
+              <div class="field-error" id="vehicleErr"></div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phone Number *</label>
+              <div class="input-wrap">
+                <span class="input-icon">📞</span>
+                <input type="tel" id="phone" class="form-control" placeholder="+44 7700 000000" autocomplete="tel"/>
+              </div>
+              <div class="field-error" id="phoneErr"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Select Slot *</label>
+              <div class="input-wrap">
+                <span class="input-icon">🅿️</span>
+                <select id="slotSelect" class="form-control">
+                  <option value="">— Loading slots... —</option>
+                </select>
+              </div>
+              <div class="field-error" id="slotErr"></div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Check-In *</label>
+              <div class="input-wrap">
+                <span class="input-icon">📅</span>
+                <input type="datetime-local" id="checkIn" class="form-control"/>
+              </div>
+              <div class="field-error" id="checkInErr"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Check-Out <span style="color:var(--text-muted);font-size:0.7rem;text-transform:none;letter-spacing:0">(optional)</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">📅</span>
+                <input type="datetime-local" id="checkOut" class="form-control"/>
+              </div>
+              <div class="field-error" id="checkOutErr"></div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-full btn-lg" onclick="submitNormal()" id="bookBtn" style="margin-top:4px;font-size:1rem;letter-spacing:0.3px">
+            ✅ Confirm Booking
+          </button>
+        </div>
+
+        <!-- Normal Success -->
+        <div class="success-confirm" id="normalSuccess">
+          <div class="success-icon">✅</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:var(--green);margin-bottom:10px">
+            Booking Confirmed!
+          </div>
+          <div id="normalSuccessMsg" style="color:var(--text-secondary);margin-bottom:24px;line-height:1.6"></div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-secondary" onclick="resetNormal()">+ New Booking</button>
+            <a href="my-bookings.html" class="btn btn-primary">📋 View Bookings</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
