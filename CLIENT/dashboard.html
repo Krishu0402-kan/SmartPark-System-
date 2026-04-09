@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartPark – Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🅿</div>
+    <div class="logo-text">SmartPark</div>
+    <div class="logo-sub">Smart Parking System</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Navigation</div>
+        <a href="about.html" class="nav-link">
+      <span class="nav-icon">ℹ️</span> About
+    </a>
+    <a href="dashboard.html" class="nav-link active">
+      <span class="nav-icon">🏠</span> Dashboard
+    </a>
+    <a href="book-slot.html" class="nav-link">
+      <span class="nav-icon">📅</span> Book a Slot
+    </a>
+    <a href="my-bookings.html" class="nav-link">
+      <span class="nav-icon">📋</span> My Bookings
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <span class="status-dot" id="apiDot"></span>
+    <span class="status-text" id="apiStatus">Checking...</span>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Dashboard</div>
+      <div class="page-subtitle">Real-time parking overview</div>
+    </div>
+    <div class="topbar-right">
+      <div class="clock" id="clock">00:00:00</div>
+      <a href="book-slot.html" class="btn btn-primary btn-sm">+ Book Slot</a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- WELCOME BANNER -->
+    <div style="margin-bottom:24px;padding:20px 24px;background:linear-gradient(135deg,rgba(0,210,150,0.07),rgba(64,144,255,0.05));border:1px solid rgba(0,210,150,0.15);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:var(--text-primary);margin-bottom:3px">
+          👋 Welcome to SmartPark
+        </div>
+        <div style="font-size:0.82rem;color:var(--text-muted)">Live data refreshes every 30 seconds · <span id="lastRefresh">Loading...</span></div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="loadData()">↻ Refresh Now</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card blue">
+        <div class="stat-icon">🅿️</div>
+        <div class="stat-label">Total Slots</div>
+        <div class="stat-value" id="statTotal">—</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">✅</div>
+        <div class="stat-label">Available</div>
+        <div class="stat-value" id="statAvailable">—</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon">🚗</div>
+        <div class="stat-label">Occupied</div>
+        <div class="stat-value" id="statOccupied">—</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-icon">🚨</div>
+        <div class="stat-label">Emergency</div>
+        <div class="stat-value" id="statEmergency">—</div>
+      </div>
+    </div>
+
+    <!-- SLOT MAP -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">🅿️ Live Parking Map</span>
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+          <div style="display:flex;gap:12px;font-size:0.76rem;color:var(--text-muted)">
+            <span><span style="color:var(--green)">●</span> Available</span>
+            <span><span style="color:var(--red)">●</span> Occupied</span>
+            <span><span style="color:var(--blue)">●</span> Disabled</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadData()">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="panel-body" id="slotMapContainer">
+        <div class="empty-state"><div class="loading-spinner" style="width:28px;height:28px;border-width:3px"></div></div>
+      </div>
+    </div>
+
+    <!-- OCCUPANCY BAR -->
+    <div class="panel" id="occupancyPanel" style="display:none">
+      <div class="panel-body" style="padding:20px 24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);font-weight:600">Occupancy Rate</span>
+          <span style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text-primary)" id="occupancyPct">0%</span>
+        </div>
+        <div style="height:8px;background:var(--bg-card-hover);border-radius:4px;overflow:hidden">
+          <div id="occupancyBar" style="height:100%;border-radius:4px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT BOOKINGS -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">📋 Recent Active Bookings</span>
+        <a href="my-bookings.html" class="btn btn-secondary btn-sm">View All →</a>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table" id="recentTable">
+          <thead>
+            <tr>
+              <th>ID</th><th>Slot</th><th>Owner</th>
+              <th>Vehicle</th><th>Type</th><th>Check In</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recentBody">
+            <tr><td colspan="7" style="text-align:center;padding:40px">
+              <div class="loading-spinner"></div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const API = 'http://localhost:3000/api';
+
+function showToast(msg, type = 'info') {
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// Clock
+function updateClock() {
+  document.getElementById('clock').textContent =
+    new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+async function loadData() {
+  try {
+    const [slotsRes, bookingsRes, emergencyRes] = await Promise.all([
+      fetch(`${API}/slots`),
+      fetch(`${API}/bookings?status=active`),
+      fetch(`${API}/bookings?booking_type=emergency&status=active`)
+    ]);
+
+    const slotsData     = await slotsRes.json();
+    const bookingsData  = await bookingsRes.json();
+    const emergencyData = await emergencyRes.json();
+
+    const slots    = slotsData.slots || [];
+    const bookings = bookingsData.bookings || [];
+
+    const available = slots.filter(s => s.status === 'available').length;
+    const occupied  = slots.filter(s => s.status === 'occupied').length;
+    const pct       = slots.length ? Math.round((occupied / slots.length) * 100) : 0;
+
+    // Animate numbers
+    animateValue('statTotal',     0, slots.length,                   600);
+    animateValue('statAvailable', 0, available,                      600);
+    animateValue('statOccupied',  0, occupied,                       600);
+    animateValue('statEmergency', 0, emergencyData.count || 0,       600);
+
+    // Occupancy bar
+    const panel = document.getElementById('occupancyPanel');
+    panel.style.display = 'block';
+    document.getElementById('occupancyPct').textContent = pct + '%';
+    const bar = document.getElementById('occupancyBar');
+    bar.style.width = pct + '%';
+    bar.style.background = pct > 80 ? 'var(--red)' : pct > 50 ? 'var(--amber)' : 'var(--green)';
+
+    renderSlotMap(slots);
+    renderRecentBookings(bookings.slice(0, 8));
+
+    const now = new Date();
+    document.getElementById('lastRefresh').textContent =
+      'Last updated: ' + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  } catch (err) {
+    showToast('Could not connect to API. Make sure the server is running.', 'error');
+    document.getElementById('slotMapContainer').innerHTML =
+      '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">API unavailable — start the server and refresh</div></div>';
+  }
+}
+
+function animateValue(id, start, end, duration) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const startTime = performance.now();
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(start + (end - start) * ease);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+function renderSlotMap(slots) {
+  const floors = [...new Set(slots.map(s => s.floor))].sort();
+  let html = '';
+  for (const floor of floors) {
+    const floorSlots = slots.filter(s => s.floor === floor);
+    html += `<div class="floor-label">${floor} Floor</div><div class="slot-grid">`;
+    for (const slot of floorSlots) {
+      const isDisabled = slot.type === 'disabled';
+      const cls  = isDisabled ? 'disabled-type' : slot.status;
+      const icon = slot.type === 'bike' ? '🏍' : slot.type === 'disabled' ? '♿' : '🚗';
+      const link = slot.status === 'available' ? `href="book-slot.html?slot=${slot.id}"` : '';
+      const title = `${slot.slot_number} – ${slot.status} (${slot.type})`;
+      html += `<a ${link} class="slot-cell ${cls}" title="${title}">
+        <span>${slot.slot_number}</span>
+        <span class="slot-type-label">${icon}</span>
+      </a>`;
+    }
+    html += `</div>`;
+  }
+  document.getElementById('slotMapContainer').innerHTML = html;
+}
+
+function renderRecentBookings(bookings) {
+  const tbody = document.getElementById('recentBody');
+  if (!bookings.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">
+      <span class="empty-state-icon">📭</span>
+      <div class="empty-state-text">No active bookings at this time</div>
+    </div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = bookings.map(b => `
+    <tr onclick="window.location='my-bookings.html'" style="cursor:pointer">
+      <td style="color:var(--text-muted)">#${b.id}</td>
+      <td>
+        <strong style="color:var(--text-primary)">${b.slot_number}</strong>
+        <br><small style="color:var(--text-muted)">${b.floor} Floor</small>
+      </td>
+      <td style="color:var(--text-primary)">${b.owner_name}</td>
+      <td style="font-family:'Rajdhani',sans-serif;font-size:1rem;letter-spacing:0.5px">${b.vehicle_number}</td>
+      <td>${b.booking_type === 'emergency'
+        ? '<span class="badge badge-red">🚨 Emergency</span>'
+        : '<span class="badge badge-green">Normal</span>'}</td>
+      <td style="color:var(--text-muted);font-size:0.82rem">${b.check_in}</td>
+      <td><span class="badge badge-green">Active</span></td>
+    </tr>`).join('');
+}
+
+loadData();
+setInterval(loadData, 30000);
+</script>
+
+<script>
+(async function checkAPI() {
+  const dot = document.getElementById('apiDot');
+  const txt = document.getElementById('apiStatus');
+  if (!dot || !txt) return;
+  try {
+    const res = await fetch('http://localhost:3000/', { signal: AbortSignal.timeout(3000) });
+    if (res.ok) { dot.style.background = 'var(--green)'; txt.textContent = 'API Connected'; }
+    else throw new Error();
+  } catch {
+    dot.style.background = 'var(--red)';
+    dot.style.animation = 'none';
+    txt.textContent = 'API Offline';
+    txt.style.color = 'var(--red)';
+  }
+})();
+</script>
+</body>
+</html>
