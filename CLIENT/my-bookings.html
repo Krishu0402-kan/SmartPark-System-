@@ -76,3 +76,17 @@
 
   </div>
 </main>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-title" style="color:var(--red)">🗑 Delete Booking</div>
+    <div class="modal-body" id="deleteModalMsg">Are you sure you want to delete this booking?</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()" id="confirmDeleteBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
