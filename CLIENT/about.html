@@ -9,8 +9,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet"/>
   <style>
 
-/* ══════════════════════════════════════════════════
-<!-- Basic About page structure -->
+/* ═══════════════════════════════════════════════════
+   ABOUT PAGE — PREMIUM OVERHAUL
+   Aesthetic: Dark Observatory · Neon Emerald Accent
 ═══════════════════════════════════════════════════ */
 
 /* ── Ambient floating orbs ── */
@@ -462,3 +463,290 @@
 }
   </style>
 </head>
+<body>
+
+<!-- Ambient orbs -->
+<div class="about-atmosphere">
+  <div class="atm-orb atm-orb-1"></div>
+  <div class="atm-orb atm-orb-2"></div>
+  <div class="atm-orb atm-orb-3"></div>
+</div>
+
+<!-- ── SIDEBAR ────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🅿</div>
+    <div class="logo-text">SmartPark</div>
+    <div class="logo-sub">Smart Parking System</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Navigation</div>
+    <a href="about.html" class="nav-link active"><span class="nav-icon">ℹ️</span> About</a>
+    <a href="dashboard.html" class="nav-link"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="book-slot.html" class="nav-link"><span class="nav-icon">📅</span> Book a Slot</a>
+    <a href="my-bookings.html" class="nav-link"><span class="nav-icon">📋</span> My Bookings</a>
+  </nav>
+  <div class="sidebar-footer">
+    <span class="status-dot" id="apiDot"></span>
+    <span class="status-text" id="apiStatus">Checking...</span>
+  </div>
+</aside>
+
+<!-- ── MAIN ──────────────────────────────────── -->
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">About</div>
+      <div class="page-subtitle">Platform overview · Features · Team</div>
+    </div>
+  </div>
+
+  <div class="content">
+  <div class="about-content">
+
+    <!-- ① HERO ────────────────────────────────── -->
+    <div class="hero-wrap">
+      <div class="hero-card">
+        <div class="hero-grid-bg"></div>
+
+        <div class="hero-logo-sys">
+          <div class="h-ring h-ring-3"></div>
+          <div class="h-ring h-ring-2"></div>
+          <div class="h-ring h-ring-1"></div>
+          <div class="h-logo-icon">🅿️</div>
+        </div>
+
+        <div class="h-eyebrow">Smart Car Parking System</div>
+        <div class="h-title">SmartPark</div>
+
+        <p class="h-desc">
+          SmartPark is a real-time parking management system designed to optimise
+          space allocation, streamline booking operations, and provide instant visibility
+          of parking availability through a responsive and intuitive interface.
+          Smart Parking System helps users easily book and manage parking slots.
+        </p>
+
+        <div class="h-pills">
+          <span class="h-pill hp-g">✦ v1.0.0 Stable</span>
+          <span class="h-pill hp-b">⚡ Real-Time System</span>
+          <span class="h-pill hp-a">🅿 22 Slots</span>
+          <span class="h-pill hp-g">🔁 Full CRUD</span>
+          <span class="h-pill hp-r">🚨 Emergency Mode</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ② STATS BAR ──────────────────────────── -->
+    <div class="stats-bar">
+      <div class="sb-cell">
+        <div class="sb-num snv-g">22</div>
+        <div class="sb-lbl">Parking Slots</div>
+      </div>
+      <div class="sb-cell">
+        <div class="sb-num snv-b">12</div>
+        <div class="sb-lbl">System Modules</div>
+      </div>
+      <div class="sb-cell">
+        <div class="sb-num snv-a">5</div>
+        <div class="sb-lbl">UI Pages</div>
+      </div>
+      <div class="sb-cell">
+        <div class="sb-num snv-r">2</div>
+        <div class="sb-lbl">Booking Modes</div>
+      </div>
+    </div>
+
+    <!-- ③ FEATURES ───────────────────────────── -->
+    <div class="sec-div">
+      <div class="sec-div-label">Key Features</div>
+      <div class="sec-div-line"></div>
+    </div>
+
+    <div class="feat-grid">
+      <div class="feat-card fc-green">
+        <div class="feat-ib fib-g">📊</div>
+        <div class="feat-title">Live Dashboard</div>
+        <div class="feat-desc">
+         Provides a real-time overview of parking availability across all floors,
+         enabling efficient monitoring and faster decision-making.
+        </div>
+        <span class="feat-pill fp-g">Real-time</span>
+      </div>
+
+      <div class="feat-card fc-blue">
+        <div class="feat-ib fib-b">📅</div>
+        <div class="feat-title">Smart Booking</div>
+        <div class="feat-desc">
+          Guided booking flow with floor-based slot filtering, instant validation,
+          and one-click pre-selection from the live parking map.
+        </div>
+        <span class="feat-pill fp-b">Streamlined</span>
+      </div>
+
+      <div class="feat-card fc-red">
+        <div class="feat-ib fib-r">🚨</div>
+        <div class="feat-title">Emergency Mode</div>
+        <div class="feat-desc">
+          Single-action high-priority booking that auto-assigns the nearest available
+          slot instantly — no selection needed, no delay.
+        </div>
+        <span class="feat-pill fp-r">Priority</span>
+      </div>
+
+      <div class="feat-card fc-amber">
+        <div class="feat-ib fib-a">📋</div>
+        <div class="feat-title">Booking Management</div>
+        <div class="feat-desc">
+          Search, filter, edit and cancel any booking. Slot states sync automatically
+          the moment a booking status changes.
+        </div>
+        <span class="feat-pill fp-a">Full Control</span>
+      </div>
+    </div>
+
+    <!-- ④ HOW IT WORKS ───────────────────────── -->
+    <div class="hiw-wrap">
+      <div class="sec-div">
+        <div class="sec-div-label">How It Works</div>
+        <div class="sec-div-line"></div>
+      </div>
+
+      <div class="hiw-grid">
+        <div class="hiw-card">
+          <div class="hiw-bubble">🗺️</div>
+          <div class="hiw-title">View Available Slots</div>
+          <div class="hiw-desc">Open the live dashboard to instantly see the real-time map across all floors.</div>
+        </div>
+        <div class="hiw-card">
+          <div class="hiw-bubble">✍️</div>
+          <div class="hiw-title">Book a Slot</div>
+          <div class="hiw-desc">Select an available slot, submit booking details, and confirm through a validated, responsive booking process.</div>
+        </div>
+        <div class="hiw-card">
+          <div class="hiw-bubble">📂</div>
+          <div class="hiw-title">Manage Bookings</div>
+          <div class="hiw-desc">Edit, extend or cancel bookings any time. Slots free up immediately on cancellation.</div>
+        </div>
+        <div class="hiw-card">
+          <div class="hiw-bubble">🚨</div>
+          <div class="hiw-title">Emergency Auto-Assign</div>
+          <div class="hiw-desc">One tap auto-assigns the nearest slot at top priority for urgent situations.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑤ SYSTEM COMPONENTS ──────────────────── -->
+    <div class="tech-wrap">
+      <div class="sec-div">
+        <div class="sec-div-label">System Components</div>
+        <div class="sec-div-line"></div>
+      </div>
+
+      <div class="tech-grid-new">
+
+        <div class="tech-card-new">
+          <div class="tcn-ico">🗺️</div>
+          <div>
+            <div class="tcn-name">Real-Time Slot Map</div>
+            <div class="tcn-desc">Live floor-by-floor visual map showing available, occupied, and reserved slots instantly</div>
+          </div>
+        </div>
+
+        <div class="tech-card-new">
+          <div class="tcn-ico">📅</div>
+          <div>
+            <div class="tcn-name">Booking Engine</div>
+            <div class="tcn-desc">Validated booking pipeline with conflict detection, time-slot management, and instant confirmation</div>
+          </div>
+        </div>
+
+        <div class="tech-card-new">
+          <div class="tcn-ico">🚨</div>
+          <div>
+            <div class="tcn-name">Emergency Auto-Assign</div>
+            <div class="tcn-desc">Priority algorithm that instantly locates and reserves the nearest available slot in one action</div>
+          </div>
+        </div>
+
+        <div class="tech-card-new">
+          <div class="tcn-ico">🔄</div>
+          <div>
+            <div class="tcn-name">Live Sync Engine</div>
+            <div class="tcn-desc">All slot states update in real time across the dashboard the moment a booking is made or cancelled</div>
+          </div>
+        </div>
+
+        <div class="tech-card-new">
+          <div class="tcn-ico">🏢</div>
+          <div>
+            <div class="tcn-name">Multi-Floor Management</div>
+            <div class="tcn-desc">Supports multiple parking floors with independent slot tracking and floor-based filtering</div>
+          </div>
+        </div>
+
+        <div class="tech-card-new">
+          <div class="tcn-ico">🔍</div>
+          <div>
+            <div class="tcn-name">Booking Search & Filter</div>
+            <div class="tcn-desc">Quickly locate any booking by vehicle, date, or slot — with full edit and cancel controls</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ⑥ DEVELOPER ──────────────────────────── -->
+    <div class="dev-wrap">
+      <div class="sec-div">
+        <div class="sec-div-label">Developer</div>
+        <div class="sec-div-line"></div>
+      </div>
+
+      <div class="dev-card">
+        <div class="dev-avatar">👨‍💻</div>
+        <div class="dev-body">
+          <div class="dev-name">Krishu Kandel</div>
+          <div class="dev-role">Full-Stack Developer</div>
+          <div class="dev-bio">
+           SmartPark was developed as a full-stack web application with a focus on
+           scalable system architecture, efficient data management, and user-centred
+           design. The system integrates backend services with a responsive frontend
+           to deliver real-time parking management and seamless user interaction.
+          </div>
+          <div class="dev-tags">
+            <span class="dev-tag">Real-Time Monitoring</span>
+            <span class="dev-tag">Smart Slot Allocation</span>
+            <span class="dev-tag">Instant Booking System</span>
+            <span class="dev-tag">Emergency Auto-Assign</span>
+            <span class="dev-tag">Live Data Sync</span>
+            <span class="dev-tag">User-Friendly Interface</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /about-content -->
+  </div><!-- /content -->
+</main>
+
+<script>
+(async function checkAPI() {
+  const dot = document.getElementById('apiDot');
+  const txt = document.getElementById('apiStatus');
+  if (!dot || !txt) return;
+  try {
+    const res = await fetch('http://localhost:3000/', { signal: AbortSignal.timeout(3000) });
+    if (res.ok) {
+      dot.style.background = 'var(--green)';
+      txt.textContent = 'API Connected';
+    } else throw new Error();
+  } catch {
+    dot.style.background = 'var(--red)';
+    dot.style.animation = 'none';
+    txt.textContent = 'API Offline';
+    txt.style.color = 'var(--red)';
+  }
+})();
+</script>
+</body>
+</html>
