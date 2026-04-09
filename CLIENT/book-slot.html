@@ -203,3 +203,233 @@
 
   </div>
 </main>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const API = 'http://localhost:3000/api';
+
+function showToast(msg, type = 'info') {
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+function clearErrors() {
+  document.querySelectorAll('.field-error').forEach(e => e.textContent = '');
+  document.querySelectorAll('.form-control').forEach(e => e.style.borderColor = '');
+}
+
+function setError(id, msg) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = '⚠ ' + msg;
+  // highlight corresponding input
+  const inputId = id.replace('Err','');
+  const input = document.getElementById(inputId);
+  if (input) input.style.borderColor = 'var(--red)';
+}
+
+// Set default check-in to now
+const now = new Date();
+now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+document.getElementById('checkIn').value = now.toISOString().slice(0,16);
+
+// Auto uppercase vehicle inputs
+['emVehicle','vehicle'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', function() {
+    const pos = this.selectionStart;
+    this.value = this.value.toUpperCase();
+    this.setSelectionRange(pos, pos);
+  });
+});
+
+async function loadSlots() {
+  try {
+    const res  = await fetch(`${API}/slots?status=available`);
+    const data = await res.json();
+    const sel  = document.getElementById('slotSelect');
+    const slots = data.slots || [];
+
+    document.getElementById('slotsAvailableCount').textContent =
+      `${slots.length} slot${slots.length !== 1 ? 's' : ''} available`;
+
+    sel.innerHTML = '<option value="">— Select a slot —</option>';
+    const byFloor = {};
+    slots.forEach(s => {
+      if (!byFloor[s.floor]) byFloor[s.floor] = [];
+      byFloor[s.floor].push(s);
+    });
+    for (const [floor, floorSlots] of Object.entries(byFloor)) {
+      const og = document.createElement('optgroup');
+      og.label = `${floor} Floor`;
+      floorSlots.forEach(s => {
+        const o = document.createElement('option');
+        o.value = s.id;
+        const icon = s.type === 'bike' ? '🏍' : s.type === 'disabled' ? '♿' : '🚗';
+        o.textContent = `${icon} ${s.slot_number} – ${s.type}`;
+        og.appendChild(o);
+      });
+      sel.appendChild(og);
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const pre = params.get('slot');
+    if (pre) sel.value = pre;
+  } catch {
+    showToast('Failed to load available slots', 'error');
+  }
+}
+
+// ─── EMERGENCY ─────────────────────────────────────────────────────────────
+async function submitEmergency() {
+  clearErrors();
+  const name    = document.getElementById('emName').value.trim();
+  const vehicle = document.getElementById('emVehicle').value.trim();
+  const phone   = document.getElementById('emPhone').value.trim();
+  const type    = document.getElementById('emType').value;
+
+  let valid = true;
+  if (!name || name.length < 2)   { setError('emNameErr',    'Name must be at least 2 characters'); valid = false; }
+  if (!vehicle)                    { setError('emVehicleErr', 'Vehicle number is required'); valid = false; }
+  if (!phone || phone.length < 7)  { setError('emPhoneErr',   'Please enter a valid phone number'); valid = false; }
+  if (!valid) return;
+
+  const btn = document.getElementById('emBtn');
+  btn.innerHTML = '<span class="loading-spinner" style="border-top-color:#fff"></span> Assigning slot...';
+  btn.disabled = true;
+
+  try {
+    const res  = await fetch(`${API}/bookings/emergency`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ owner_name: name, vehicle_number: vehicle, phone, type })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showToast(data.error || 'Emergency booking failed', 'error');
+      btn.innerHTML = '🚨 Book Emergency Slot Now';
+      btn.disabled = false;
+      return;
+    }
+
+    document.getElementById('emergencyForm').style.display = 'none';
+    document.getElementById('emergencySuccess').classList.add('show');
+    document.getElementById('emergencySuccessMsg').textContent =
+      `Slot ${data.booking.slot_number} (${data.booking.floor} Floor) has been assigned to ${name}.`;
+    showToast('Emergency slot assigned successfully!', 'success');
+    loadSlots();
+  } catch {
+    showToast('Connection error. Is the API running?', 'error');
+    btn.innerHTML = '🚨 Book Emergency Slot Now';
+    btn.disabled = false;
+  }
+}
+
+function resetEmergency() {
+  document.getElementById('emergencyForm').style.display = 'block';
+  document.getElementById('emergencySuccess').classList.remove('show');
+  ['emName','emVehicle','emPhone'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('emBtn').innerHTML = '🚨 Book Emergency Slot Now';
+  document.getElementById('emBtn').disabled = false;
+  clearErrors();
+}
+
+// ─── NORMAL ────────────────────────────────────────────────────────────────
+async function submitNormal() {
+  clearErrors();
+  const name     = document.getElementById('name').value.trim();
+  const vehicle  = document.getElementById('vehicle').value.trim();
+  const phone    = document.getElementById('phone').value.trim();
+  const slotId   = document.getElementById('slotSelect').value;
+  const checkIn  = document.getElementById('checkIn').value;
+  const checkOut = document.getElementById('checkOut').value;
+
+  let valid = true;
+  if (!name || name.length < 2)  { setError('nameErr',    'Name must be at least 2 characters'); valid = false; }
+  if (!vehicle)                   { setError('vehicleErr', 'Vehicle number is required'); valid = false; }
+  if (!phone || phone.length < 7) { setError('phoneErr',   'Please enter a valid phone number'); valid = false; }
+  if (!slotId)                    { setError('slotErr',    'Please select a slot'); valid = false; }
+  if (!checkIn)                   { setError('checkInErr', 'Check-in time is required'); valid = false; }
+  if (checkOut && new Date(checkOut) <= new Date(checkIn)) {
+    setError('checkOutErr', 'Check-out must be after check-in'); valid = false;
+  }
+  if (!valid) return;
+
+  const btn = document.getElementById('bookBtn');
+  btn.innerHTML = '<span class="loading-spinner" style="border-top-color:#001a0f"></span> Confirming...';
+  btn.disabled = true;
+
+  const formatDT = v => v ? v.replace('T', ' ') : null;
+
+  try {
+    const res  = await fetch(`${API}/bookings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        slot_id: parseInt(slotId),
+        owner_name: name,
+        vehicle_number: vehicle,
+        phone,
+        check_in:  formatDT(checkIn),
+        check_out: formatDT(checkOut)
+      })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showToast(data.error || 'Booking failed', 'error');
+      btn.innerHTML = '✅ Confirm Booking';
+      btn.disabled = false;
+      return;
+    }
+
+    document.getElementById('normalForm').style.display = 'none';
+    document.getElementById('normalSuccess').classList.add('show');
+    document.getElementById('normalSuccessMsg').textContent =
+      `Slot ${data.booking.slot_number} booked for ${name}. Check-in: ${data.booking.check_in}`;
+    showToast('Booking confirmed!', 'success');
+    loadSlots();
+  } catch {
+    showToast('Connection error. Is the API running?', 'error');
+    btn.innerHTML = '✅ Confirm Booking';
+    btn.disabled = false;
+  }
+}
+
+function resetNormal() {
+  document.getElementById('normalForm').style.display = 'block';
+  document.getElementById('normalSuccess').classList.remove('show');
+  ['name','vehicle','phone','checkOut'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('bookBtn').innerHTML = '✅ Confirm Booking';
+  document.getElementById('bookBtn').disabled = false;
+  clearErrors();
+  loadSlots();
+}
+
+loadSlots();
+</script>
+
+<script>
+(async function checkAPI() {
+  const dot = document.getElementById('apiDot');
+  const txt = document.getElementById('apiStatus');
+  if (!dot || !txt) return;
+  try {
+    const res = await fetch('http://localhost:3000/', { signal: AbortSignal.timeout(3000) });
+    if (res.ok) { dot.style.background = 'var(--green)'; txt.textContent = 'API Connected'; }
+    else throw new Error();
+  } catch {
+    dot.style.background = 'var(--red)';
+    dot.style.animation = 'none';
+    txt.textContent = 'API Offline';
+    txt.style.color = 'var(--red)';
+  }
+})();
+</script>
+</body>
+</html>
