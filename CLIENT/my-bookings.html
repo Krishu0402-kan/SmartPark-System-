@@ -26,3 +26,53 @@
     <span class="status-text" id="apiStatus">Checking...</span>
   </div>
 </aside>
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">My Bookings</div>
+      <div class="page-subtitle">View and manage all parking bookings</div>
+    </div>
+    <div class="topbar-right">
+      <a href="book-slot.html" class="btn btn-primary btn-sm">+ New Booking</a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="filter-tabs" id="filterTabs">
+          <button class="filter-tab active" onclick="filterBy('all', this)">All</button>
+          <button class="filter-tab" onclick="filterBy('active', this)">🟢 Active</button>
+          <button class="filter-tab" onclick="filterBy('emergency', this)">🚨 Emergency</button>
+          <button class="filter-tab" onclick="filterBy('completed', this)">✅ Completed</button>
+          <button class="filter-tab" onclick="filterBy('cancelled', this)">❌ Cancelled</button>
+        </div>
+        <div class="search-bar" style="width:230px">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="form-control" id="searchInput" placeholder="Search name, vehicle, slot..." oninput="applySearch()"/>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>##</th><th>Slot</th><th>Owner</th><th>Vehicle</th>
+              <th>Phone</th><th>Check In</th><th>Check Out</th>
+              <th>Type</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsBody">
+            <tr><td colspan="10" style="text-align:center;padding:48px">
+              <div class="loading-spinner" style="width:28px;height:28px;border-width:3px"></div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="bookingCount" style="padding:12px 20px;font-size:0.78rem;color:var(--text-muted);border-top:1px solid var(--border)"></div>
+    </div>
+
+  </div>
+</main>
