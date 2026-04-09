@@ -26,3 +26,160 @@
     <span class="status-text" id="apiStatus">Checking...</span>
   </div>
 </aside>
+
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Edit Booking</div>
+      <div class="page-subtitle" id="topbarSub">Loading...</div>
+    </div>
+    <div class="topbar-right">
+      <a href="my-bookings.html" class="btn btn-secondary btn-sm">← Back to Bookings</a>
+    </div>
+  </div>
+
+  <div class="content" style="max-width:700px">
+
+    <!-- Loading -->
+    <div id="loadingState" style="text-align:center;padding:80px;color:var(--text-muted)">
+      <div class="loading-spinner" style="width:32px;height:32px;border-width:3px;margin:0 auto 18px"></div>
+      <div>Loading booking details..</div>
+    </div>
+
+    <!-- Error -->
+    <div id="errorState" style="display:none">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="empty-state">
+            <span class="empty-state-icon">❌</span>
+            <div class="empty-state-text" id="errorMsg">Booking not found</div>
+            <a href="my-bookings.html" class="btn btn-secondary" style="margin-top:20px">← Back to Bookings</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Form -->
+    <div id="editFormContainer" style="display:none">
+
+      <!-- Booking Info Bar -->
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-body" style="padding:18px 24px;display:flex;gap:28px;flex-wrap:wrap;align-items:center">
+          <div class="info-item">
+            <div class="info-label">Booking ID</div>
+            <div class="info-value" style="font-family:'Rajdhani',sans-serif;font-size:1.3rem" id="infoId">—</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Slot</div>
+            <div class="info-value" style="font-family:'Rajdhani',sans-serif;font-size:1.3rem;color:var(--green)" id="infoSlot">—</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Floor</div>
+            <div class="info-value" id="infoFloor">—</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Booking Type</div>
+            <div id="infoType">—</div>
+          </div>
+          <div class="info-item" style="margin-left:auto">
+            <div class="info-label">Changes</div>
+            <div id="changesIndicator" style="font-size:0.82rem;color:var(--text-muted)">None</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">✏️ Update Booking Details</span>
+          <span style="font-size:0.76rem;color:var(--text-muted)">Fields highlighted in amber have been changed</span>
+        </div>
+        <div class="panel-body">
+
+          <div id="editFields">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <div class="input-wrap">
+                  <span class="input-icon">👤</span>
+                  <input type="text" id="editName" class="form-control" autocomplete="name"/>
+                </div>
+                <div class="field-error" id="editNameErr"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Vehicle Number *</label>
+                <div class="input-wrap">
+                  <span class="input-icon">🚗</span>
+                  <input type="text" id="editVehicle" class="form-control" autocomplete="off" style="text-transform:uppercase"/>
+                </div>
+                <div class="field-error" id="editVehicleErr"></div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Phone Number *</label>
+                <div class="input-wrap">
+                  <span class="input-icon">📞</span>
+                  <input type="tel" id="editPhone" class="form-control" autocomplete="tel"/>
+                </div>
+                <div class="field-error" id="editPhoneErr"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Status</label>
+                <div class="input-wrap">
+                  <span class="input-icon">📊</span>
+                  <select id="editStatus" class="form-control">
+                    <option value="active">🟢 Active</option>
+                    <option value="completed">✅ Completed</option>
+                    <option value="cancelled">❌ Cancelled</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Check-In *</label>
+                <div class="input-wrap">
+                  <span class="input-icon">📅</span>
+                  <input type="datetime-local" id="editCheckIn" class="form-control"/>
+                </div>
+                <div class="field-error" id="editCheckInErr"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Check-Out <span style="color:var(--text-muted);font-size:0.7rem;text-transform:none;letter-spacing:0">(optional)</span></label>
+                <div class="input-wrap">
+                  <span class="input-icon">📅</span>
+                  <input type="datetime-local" id="editCheckOut" class="form-control"/>
+                </div>
+                <div class="field-error" id="editCheckOutErr"></div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:8px">
+              <a href="my-bookings.html" class="btn btn-secondary btn-lg">Cancel</a>
+              <button class="btn btn-primary btn-lg" onclick="submitUpdate()" id="updateBtn" style="flex:1;font-size:0.95rem">
+                💾 Save Changes
+              </button>
+            </div>
+          </div>
+
+          <!-- Success -->
+          <div class="success-confirm" id="updateSuccess">
+            <div class="success-icon">✅</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:var(--green);margin-bottom:10px">
+              Update Successful!
+            </div>
+            <div id="updateSuccessMsg" style="color:var(--text-secondary);margin-bottom:24px;line-height:1.6"></div>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+              <button class="btn btn-secondary" onclick="resetForm()">✏️ Edit Again</button>
+              <a href="my-bookings.html" class="btn btn-primary">📋 View All Bookings</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
