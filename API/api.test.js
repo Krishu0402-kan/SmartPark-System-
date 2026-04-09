@@ -172,7 +172,7 @@ describe('🅿️  Slots API', () => {
   });
 });
 
-// ─── BOOKINGS TESTS ─────────────────────────────────────────────────────────
+/ ─── BOOKINGS TESTS ─────────────────────────────────────────────────────────
 
 describe('📅 Bookings API', () => {
   let bookingId;
