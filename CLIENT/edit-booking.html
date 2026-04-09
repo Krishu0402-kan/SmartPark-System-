@@ -183,3 +183,218 @@
 
   </div>
 </main>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const API = 'http://localhost:3000/api';
+let bookingId = null;
+let originalValues = {};
+let changedCount = 0;
+
+function showToast(msg, type = 'info') {
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+function clearErrors() {
+  document.querySelectorAll('.field-error').forEach(e => e.textContent = '');
+}
+
+function setError(id, msg) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = '⚠ ' + msg;
+}
+
+function toLocalDT(dtStr) {
+  if (!dtStr) return '';
+  const d = new Date(dtStr.replace(' ', 'T'));
+  const off = d.getTimezoneOffset();
+  return new Date(d.getTime() - off * 60000).toISOString().slice(0, 16);
+}
+
+function formatDT(v) { return v ? v.replace('T', ' ') : null; }
+
+// Track changes and highlight fields
+function trackChanges() {
+  const fields = ['editName','editVehicle','editPhone','editStatus','editCheckIn','editCheckOut'];
+  changedCount = 0;
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const changed = el.value !== (originalValues[id] || '');
+    if (changed) {
+      el.classList.add('changed');
+      changedCount++;
+    } else {
+      el.classList.remove('changed');
+    }
+  });
+  const indicator = document.getElementById('changesIndicator');
+  if (changedCount === 0) {
+    indicator.textContent = 'None';
+    indicator.style.color = 'var(--text-muted)';
+  } else {
+    indicator.textContent = `${changedCount} field${changedCount > 1 ? 's' : ''} changed`;
+    indicator.style.color = 'var(--amber)';
+  }
+}
+
+async function loadBooking() {
+  const params = new URLSearchParams(window.location.search);
+  bookingId = params.get('id');
+
+  if (!bookingId || isNaN(bookingId)) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display = 'block';
+    document.getElementById('errorMsg').textContent = 'No valid booking ID provided.';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/bookings/${bookingId}`);
+    if (!res.ok) throw new Error('not found');
+    const b = await res.json();
+
+    document.getElementById('topbarSub').textContent = `Editing Booking #${b.id}`;
+    document.getElementById('infoId').textContent    = `#${b.id}`;
+    document.getElementById('infoSlot').textContent  = b.slot_number;
+    document.getElementById('infoFloor').textContent = `${b.floor} Floor`;
+    document.getElementById('infoType').innerHTML    = b.booking_type === 'emergency'
+      ? '<span class="badge badge-red">🚨 Emergency</span>'
+      : '<span class="badge badge-green">Normal</span>';
+
+    // Store originals & fill form
+    const fields = {
+      editName:    b.owner_name,
+      editVehicle: b.vehicle_number,
+      editPhone:   b.phone,
+      editStatus:  b.status,
+      editCheckIn:  toLocalDT(b.check_in),
+      editCheckOut: toLocalDT(b.check_out)
+    };
+
+    Object.entries(fields).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el) { el.value = val || ''; }
+      originalValues[id] = val || '';
+    });
+
+    // Attach change listeners
+    ['editName','editVehicle','editPhone','editStatus','editCheckIn','editCheckOut'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', trackChanges);
+    });
+
+    // Auto uppercase vehicle
+    const vehicleEl = document.getElementById('editVehicle');
+    if (vehicleEl) {
+      vehicleEl.addEventListener('input', function() {
+        const pos = this.selectionStart;
+        this.value = this.value.toUpperCase();
+        this.setSelectionRange(pos, pos);
+      });
+    }
+
+    document.getElementById('loadingState').style.display    = 'none';
+    document.getElementById('editFormContainer').style.display = 'block';
+  } catch {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display   = 'block';
+    document.getElementById('errorMsg').textContent = `Booking #${bookingId} was not found.`;
+  }
+}
+
+async function submitUpdate() {
+  clearErrors();
+  const name     = document.getElementById('editName').value.trim();
+  const vehicle  = document.getElementById('editVehicle').value.trim();
+  const phone    = document.getElementById('editPhone').value.trim();
+  const status   = document.getElementById('editStatus').value;
+  const checkIn  = document.getElementById('editCheckIn').value;
+  const checkOut = document.getElementById('editCheckOut').value;
+
+  let valid = true;
+  if (!name || name.length < 2)   { setError('editNameErr',    'Name must be at least 2 characters'); valid = false; }
+  if (!vehicle)                    { setError('editVehicleErr', 'Vehicle number is required'); valid = false; }
+  if (!phone || phone.length < 7)  { setError('editPhoneErr',   'Please enter a valid phone number'); valid = false; }
+  if (!checkIn)                    { setError('editCheckInErr', 'Check-in time is required'); valid = false; }
+  if (checkOut && new Date(checkOut) <= new Date(checkIn)) {
+    setError('editCheckOutErr', 'Check-out must be after check-in'); valid = false;
+  }
+  if (!valid) return;
+
+  const btn = document.getElementById('updateBtn');
+  btn.innerHTML = '<span class="loading-spinner" style="border-top-color:#001a0f"></span> Saving...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/bookings/${bookingId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        owner_name:     name,
+        vehicle_number: vehicle,
+        phone,
+        status,
+        check_in:  formatDT(checkIn),
+        check_out: formatDT(checkOut)
+      })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showToast(data.error || 'Update failed', 'error');
+      btn.innerHTML = '💾 Save Changes';
+      btn.disabled = false;
+      return;
+    }
+
+    document.getElementById('editFields').style.display = 'none';
+    document.getElementById('updateSuccess').classList.add('show');
+    const summary = changedCount > 0
+      ? `${changedCount} field${changedCount > 1 ? 's' : ''} updated for booking #${bookingId}.`
+      : `Booking #${bookingId} has been saved.`;
+    document.getElementById('updateSuccessMsg').textContent = summary + ` Owner: ${name}.`;
+    showToast('Booking updated successfully!', 'success');
+  } catch {
+    showToast('Connection error. Is the API running?', 'error');
+    btn.innerHTML = '💾 Save Changes';
+    btn.disabled = false;
+  }
+}
+
+function resetForm() {
+  document.getElementById('editFields').style.display = 'block';
+  document.getElementById('updateSuccess').classList.remove('show');
+  document.getElementById('updateBtn').innerHTML = '💾 Save Changes';
+  document.getElementById('updateBtn').disabled = false;
+  clearErrors();
+}
+
+loadBooking();
+</script>
+
+<script>
+(async function checkAPI() {
+  const dot = document.getElementById('apiDot');
+  const txt = document.getElementById('apiStatus');
+  if (!dot || !txt) return;
+  try {
+    const res = await fetch('http://localhost:3000/', { signal: AbortSignal.timeout(3000) });
+    if (res.ok) { dot.style.background = 'var(--green)'; txt.textContent = 'API Connected'; }
+    else throw new Error();
+  } catch {
+    dot.style.background = 'var(--red)';
+    dot.style.animation = 'none';
+    txt.textContent = 'API Offline';
+    txt.style.color = 'var(--red)';
+  }
+})();
+</script>
+</body>
+</html>
