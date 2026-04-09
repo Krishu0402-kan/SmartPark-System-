@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-
+<!-- Layout and sidebar navigation -->
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-icon">🅿</div>
@@ -26,3 +26,87 @@
     <span class="status-text" id="apiStatus">Checking...</span>
   </div>
 </aside>
+
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Book a Slot</div>
+      <div class="page-subtitle">Reserve your parking space</div>
+    </div>
+    <div class="topbar-right">
+      <a href="my-bookings.html" class="btn btn-secondary btn-sm">📋 My Bookings</a>
+    </div>
+  </div>
+
+  <div class="content" style="max-width:740px">
+
+    <!-- EMERGENCY SECTION -->
+    <div class="panel" style="border-color:rgba(255,64,96,0.28);background:rgba(255,64,96,0.03)">
+      <div class="panel-header" style="border-color:rgba(255,64,96,0.15)">
+        <span class="panel-title" style="color:var(--red)">🚨 Emergency Booking</span>
+        <span class="badge badge-red" style="animation:emergency-pulse 2.5s ease-in-out infinite">PRIORITY</span>
+      </div>
+      <div class="panel-body">
+        <p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:20px;line-height:1.6">
+          Instantly auto-assigns the nearest available slot with highest priority. No slot selection required.
+        </p>
+
+        <div id="emergencyForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Full Name *</label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="emName" class="form-control" placeholder="Your full name" autocomplete="name"/>
+              </div>
+              <div class="field-error" id="emNameErr"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vehicle Number *</label>
+              <div class="input-wrap">
+                <span class="input-icon">🚗</span>
+                <input type="text" id="emVehicle" class="form-control" placeholder="e.g. AB12 CDE" autocomplete="off" style="text-transform:uppercase"/>
+              </div>
+              <div class="field-error" id="emVehicleErr"></div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phone Number *</label>
+              <div class="input-wrap">
+                <span class="input-icon">📞</span>
+                <input type="tel" id="emPhone" class="form-control" placeholder="07700 000000" autocomplete="tel"/>
+              </div>
+              <div class="field-error" id="emPhoneErr"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vehicle Type</label>
+              <div class="input-wrap">
+                <span class="input-icon">🚘</span>
+                <select id="emType" class="form-control">
+                  <option value="car">🚗 Car</option>
+                  <option value="bike">🏍 Bike</option>
+                  <option value="disabled">♿ Disabled</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-emergency btn-full" onclick="submitEmergency()" id="emBtn">
+            🚨 Book Emergency Slot Now
+          </button>
+        </div>
+
+        <!-- Emergency Success -->
+        <div class="success-confirm" id="emergencySuccess">
+          <div class="success-icon" style="background:var(--red-dim);border-color:rgba(255,64,96,0.4);box-shadow:0 0 30px rgba(255,64,96,0.2)">🚨</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:var(--red);margin-bottom:10px">
+            Emergency Slot Assigned!
+          </div>
+          <div id="emergencySuccessMsg" style="color:var(--text-secondary);margin-bottom:24px;line-height:1.6"></div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-secondary" onclick="resetEmergency()">+ New Booking</button>
+            <a href="my-bookings.html" class="btn btn-primary">📋 View Bookings</a>
+          </div>
+        </div>
+      </div>
+    </div>
