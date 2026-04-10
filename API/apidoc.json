@@ -1,0 +1,9 @@
+{
+  "name": "SmartPark API",
+  "version": "1.0.0",
+  "description": "SmartPark REST API Documentation",
+  "title": "SmartPark API Docs",
+  "url": "http://localhost:3000",
+  "src": ["./routes", "."],
+  "dest": "./apidoc"
+}
