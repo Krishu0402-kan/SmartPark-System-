@@ -5,6 +5,151 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SmartPark – Dashboard</title>
   <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet"/>
+  <style>
+/* ════════════════════ API ERROR SCREEN ════════════════════ */
+#api-error-screen {
+  position: fixed; inset: 0;
+  background: #080d12;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 99999;
+  font-family: 'Outfit', sans-serif;
+  animation: errorFadeIn 0.4s ease both;
+}
+@keyframes errorFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.err-scanline {
+  position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  z-index: 0;
+}
+.err-glow {
+  position: absolute; width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(239,68,68,0.06) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+  animation: glowPulse 3s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%,100% { transform: scale(1); opacity: 0.8; }
+  50%      { transform: scale(1.1); opacity: 1; }
+}
+.err-box {
+  position: relative; z-index: 1;
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 20px;
+  padding: 52px 64px;
+  max-width: 540px; width: 90%;
+  background: rgba(15,20,28,0.95);
+  box-shadow: 0 0 0 1px rgba(239,68,68,0.08),
+              0 32px 80px rgba(0,0,0,0.6),
+              inset 0 1px 0 rgba(255,255,255,0.04);
+  text-align: center;
+}
+.err-box::before {
+  content: '';
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 55%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(239,68,68,0.6), transparent);
+}
+.err-status-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; margin-bottom: 28px;
+}
+.err-badge {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.6rem; text-transform: uppercase;
+  letter-spacing: 3px; font-weight: 700;
+  padding: 4px 12px; border-radius: 100px;
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #ef4444;
+}
+.err-dot-blink {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  animation: blink 1.2s ease-in-out infinite;
+}
+@keyframes blink {
+  0%,100% { opacity: 1; } 50% { opacity: 0.2; }
+}
+.err-code {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 7rem; font-weight: 700; line-height: 1;
+  color: #ef4444;
+  text-shadow: 0 0 40px rgba(239,68,68,0.4), 0 0 80px rgba(239,68,68,0.15);
+  letter-spacing: -3px; margin-bottom: 10px;
+  animation: codeFlicker 6s ease-in-out infinite;
+}
+@keyframes codeFlicker {
+  0%,95%,100% { opacity: 1; }
+  96%          { opacity: 0.85; }
+  97%          { opacity: 1; }
+  98%          { opacity: 0.9; }
+}
+.err-title {
+  font-size: 1.3rem; font-weight: 700;
+  color: #f1f5f9; margin-bottom: 10px; letter-spacing: -0.3px;
+}
+.err-desc {
+  font-size: 0.87rem; color: #64748b; line-height: 1.7; margin-bottom: 6px;
+}
+.err-technical {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem; color: #374151;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px; padding: 10px 16px;
+  margin: 18px 0 28px; text-align: left;
+  line-height: 1.8;
+}
+.err-key   { color: #6b7280; }
+.err-val-r { color: #ef4444; }
+.err-val-y { color: #f59e0b; }
+.err-actions {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+}
+.err-btn-primary {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff; border: none; border-radius: 10px;
+  padding: 11px 28px; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; font-family: 'Outfit', sans-serif;
+  transition: all 0.22s ease;
+  box-shadow: 0 4px 20px rgba(16,185,129,0.3);
+}
+.err-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(16,185,129,0.4);
+}
+.err-btn-secondary {
+  background: transparent; color: #4b5563;
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
+  padding: 11px 22px; font-size: 0.85rem; font-weight: 500;
+  cursor: pointer; font-family: 'Outfit', sans-serif;
+  transition: all 0.22s ease;
+}
+.err-btn-secondary:hover {
+  background: rgba(255,255,255,0.04); color: #9ca3af;
+  border-color: rgba(255,255,255,0.13);
+}
+.err-footer {
+  position: relative; z-index: 1;
+  margin-top: 24px;
+  font-size: 0.69rem; color: #1f2937;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 2px; text-transform: uppercase;
+}
+  </style>
 </head>
 <body>
 
@@ -17,18 +162,10 @@
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section-label">Navigation</div>
-        <a href="about.html" class="nav-link">
-      <span class="nav-icon">ℹ️</span> About
-    </a>
-    <a href="dashboard.html" class="nav-link active">
-      <span class="nav-icon">🏠</span> Dashboard
-    </a>
-    <a href="book-slot.html" class="nav-link">
-      <span class="nav-icon">📅</span> Book a Slot
-    </a>
-    <a href="my-bookings.html" class="nav-link">
-      <span class="nav-icon">📋</span> My Bookings
-    </a>
+    <a href="about.html" class="nav-link"><span class="nav-icon">ℹ️</span> About</a>
+    <a href="dashboard.html" class="nav-link active"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="book-slot.html" class="nav-link"><span class="nav-icon">📅</span> Book a Slot</a>
+    <a href="my-bookings.html" class="nav-link"><span class="nav-icon">📋</span> My Bookings</a>
   </nav>
   <div class="sidebar-footer">
     <span class="status-dot" id="apiDot"></span>
@@ -145,6 +282,7 @@
 
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- ════════════════════ SCRIPTS ════════════════════ -->
 <script>
 const API = 'http://localhost:3000/api';
 
@@ -184,13 +322,11 @@ async function loadData() {
     const occupied  = slots.filter(s => s.status === 'occupied').length;
     const pct       = slots.length ? Math.round((occupied / slots.length) * 100) : 0;
 
-    // Animate numbers
-    animateValue('statTotal',     0, slots.length,                   600);
-    animateValue('statAvailable', 0, available,                      600);
-    animateValue('statOccupied',  0, occupied,                       600);
-    animateValue('statEmergency', 0, emergencyData.count || 0,       600);
+    animateValue('statTotal',     0, slots.length,            600);
+    animateValue('statAvailable', 0, available,               600);
+    animateValue('statOccupied',  0, occupied,                600);
+    animateValue('statEmergency', 0, emergencyData.count || 0, 600);
 
-    // Occupancy bar
     const panel = document.getElementById('occupancyPanel');
     panel.style.display = 'block';
     document.getElementById('occupancyPct').textContent = pct + '%';
@@ -278,20 +414,89 @@ loadData();
 setInterval(loadData, 30000);
 </script>
 
+<!-- API Status Check with full-screen error -->
 <script>
 (async function checkAPI() {
   const dot = document.getElementById('apiDot');
   const txt = document.getElementById('apiStatus');
   if (!dot || !txt) return;
-  try {
-    const res = await fetch('http://localhost:3000/', { signal: AbortSignal.timeout(3000) });
-    if (res.ok) { dot.style.background = 'var(--green)'; txt.textContent = 'API Connected'; }
-    else throw new Error();
-  } catch {
+
+  function showApiError(code) {
+    const map = {
+      503: {
+        title: 'Service Unavailable',
+        desc:  'SmartPark API server is unreachable. The server may be offline or not started.',
+        tech:  'ECONNREFUSED'
+      },
+      404: {
+        title: 'Endpoint Not Found',
+        desc:  'The API responded but the requested route does not exist.',
+        tech:  'HTTP 404 Not Found'
+      },
+      500: {
+        title: 'Internal Server Error',
+        desc:  'The API server encountered an unexpected error while processing the request.',
+        tech:  'HTTP 500 Internal Server Error'
+      }
+    };
+    const info = map[code] || { title: 'Unknown Error', desc: 'An unexpected error occurred.', tech: 'Unknown' };
+    const ts   = new Date().toISOString();
+
     dot.style.background = 'var(--red)';
-    dot.style.animation = 'none';
-    txt.textContent = 'API Offline';
-    txt.style.color = 'var(--red)';
+    dot.style.animation  = 'none';
+    txt.textContent      = 'API Error ' + code;
+    txt.style.color      = 'var(--red)';
+
+    const screen = document.createElement('div');
+    screen.id = 'api-error-screen';
+    screen.innerHTML = `
+      <div class="err-scanline"></div>
+      <div class="err-glow"></div>
+
+      <div class="err-box">
+        <div class="err-status-row">
+          <div class="err-dot-blink"></div>
+          <span class="err-badge">System Error</span>
+          <span class="err-badge" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:#374151;">
+            SmartPark v1.0.0
+          </span>
+        </div>
+
+        <div class="err-code">${code}</div>
+        <div class="err-title">${info.title}</div>
+        <div class="err-desc">${info.desc}</div>
+
+        <div class="err-technical">
+          <div><span class="err-key">Request  </span> <span class="err-val-y">GET</span> http://localhost:3000/</div>
+          <div><span class="err-key">Error    </span> <span class="err-val-r">${info.tech}</span></div>
+          <div><span class="err-key">Status   </span> <span class="err-val-r">${code}</span></div>
+          <div><span class="err-key">Timestamp</span> <span style="color:#4b5563">${ts}</span></div>
+          <div><span class="err-key">Page     </span> <span style="color:#4b5563">dashboard.html</span></div>
+        </div>
+
+        <div class="err-actions">
+          <button class="err-btn-primary" onclick="location.reload()">
+            ↻ &nbsp;Retry Connection
+          </button>
+      </div>
+
+      <div class="err-footer">SmartPark · localhost:3000 · API Gateway</div>
+    `;
+    document.body.appendChild(screen);
+  }
+
+  try {
+    const res = await fetch('http://localhost:3000/', {
+      signal: AbortSignal.timeout(3000)
+    });
+    if (res.ok) {
+      dot.style.background = 'var(--green)';
+      txt.textContent = 'API Connected';
+    } else {
+      showApiError(res.status);
+    }
+  } catch {
+    showApiError(503);
   }
 })();
 </script>
